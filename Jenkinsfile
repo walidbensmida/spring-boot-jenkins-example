@@ -16,5 +16,22 @@ pipeline{
                 sh './gradlew test'
             }
         }
+         stage ('Build docker image') {
+            steps{
+                 sh 'chmod +x gradlew'
+                 sh './gradlew docker'
+                    }
+                }
+           stage ('Push docker image') {
+
+           environment {
+                DOCKER_HUB_LOGIN = credentials('docker-hub')
+           }
+              steps{
+                  sh 'docker login --username=$DOCKER_HUB_LOGIN --password=$DOCKER_HUB_PSW'
+                  sh 'chmod +x gradlew'
+                  sh './gradlew dockerPush'
+               }
+           }
     }
 }
