@@ -5,7 +5,10 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.10.1'
     id 'com.palantir.docker' version '0.25.0'
     id 'com.palantir.docker-run' version '0.25.0'
+    id "jp.classmethod.aws.cloudformation" version "0.41"
 }
+
+version = scmVersion.version
 
 repositories {
     mavenCentral()
@@ -29,21 +32,32 @@ test {
     useJUnitPlatform()
 }
 
-project.version = scmVersion.version
+String dockerHubUsernameProperty = findProperty('dockerHubUsername') ?: 'walidbensmida'
+String imageName = "${dockerHubUsernameProperty}/spring-boot-jenkins-example:$version"
 
-String imageName = "walidbensmida/spring-boot-jenkins-example:$version"
-
-docker{
+docker {
     name imageName
     files "build/libs/${bootJar.archiveFileName.get()}"
     buildArgs([JAR_FILE: bootJar.archiveFileName.get()])
-
 }
 
 dockerRun {
-    name  project.name
+    name project.name
     image imageName
     ports '8085:8082'
     clean true
 }
+aws {
+    profileName 'default'
+}
 
+cloudFormation {
+    stackName "test-stack"
+    stackParams([
+            SubnetID: findProperty('subnetId') ?: '',
+            ServiceName: project.name,
+            ServiceVersion: project.version,
+            DockerHubUsername: dockerHubUsernameProperty
+    ])
+    templateFile project.file("ecs.yml")
+}
