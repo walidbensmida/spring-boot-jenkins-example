@@ -50,6 +50,7 @@ dockerRun {
 aws {
     profileName 'default'
 }
+import com.amazonaws.services.cloudformation.model.Capability
 
 cloudFormation {
     stackName "test-stack"
