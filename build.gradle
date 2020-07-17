@@ -49,6 +49,7 @@ dockerRun {
 }
 aws {
     profileName 'default'
+    region = 'us-east-2'
 }
 import com.amazonaws.services.cloudformation.model.Capability
 
