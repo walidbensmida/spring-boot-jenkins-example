@@ -53,7 +53,7 @@ aws {
 import com.amazonaws.services.cloudformation.model.Capability
 
 cloudFormation {
-    stackName "test-stack"
+    stackName "$project.name-stack"
     stackParams([
             SubnetID: findProperty('subnetId') ?: '',
             ServiceName: project.name,
